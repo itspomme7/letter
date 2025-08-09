@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>青春书信系列 | 文艺风书信集</title>
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+  /* ========= 基础与变量 ========= */
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  :root{
+    --text:#3f342d;
+    --border: rgba(255,255,255,.55);
+    --shadow: 0 12px 30px rgba(0,0,0,.10);
+    --glass-page: rgba(255,255,255,.46); /* 全页毛玻璃覆盖层 */
+    --glass-fill: rgba(255,255,255,.62); /* 各容器最小不透明度（防重影） */
+    --navH: 0px; /* JS 会自动写入真实高度，防止内容顶进导航 */
+  }
+
+  body{
+    font-family:'Noto Serif SC',serif;
+    color:var(--text);
+    line-height:1.9;
+    min-height:100vh;
+    overflow-x:hidden;
+    /* 背景图（同目录放 latter.jpg）+ 柔光渐变 */
+    background:
+      radial-gradient(1200px 520px at 10% -10%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(900px 520px at 110% 120%, rgba(0,0,0,.15), transparent 60%),
+      url('latter.jpg') center/cover no-repeat;
+    scroll-padding-top: calc(var(--navH) + 12px);
+    position:relative;
+  }
+
+  /* 全页统一毛玻璃覆盖层：在背景上、所有内容下（解决整体统一质感） */
+  body::before{
+    content:"";
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background: var(--glass-page);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  .container{ max-width: 980px; margin:0 auto; padding:16px 18px; position:relative; z-index:1; }
+
+  /* ========= 顶部（透明，交给全页覆盖层；保留描边/阴影） ========= */
+  .nav-glass{
+    position:sticky; top:0; z-index:999;
+    background: transparent;
+    border-bottom:1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  /* 标题区 */
+  .site-head{ text-align:center; margin: 22px 0 18px; }
+  .site-title{
+    font-family:'Ma Shan Zheng',cursive;
+    font-size:3.1rem; color:#8c6d46; letter-spacing:4px;
+    text-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .site-subtitle{
+    margin-top:6px; font-size:1.02rem; letter-spacing:8px; color:#9e8c7a; position:relative; display:inline-block;
+  }
+  .site-subtitle:before,.site-subtitle:after{
+    content:"✻"; position:absolute; top:50%; transform:translateY(-50%); color:#c5b5a4; font-size:1rem;
+  }
+  .site-subtitle:before{ left:-28px } .site-subtitle:after{ right:-28px }
+
+  /* ========= Tabs（透明 + 边框阴影；滑块高亮） ========= */
+  .tabs-wrap{ display:flex; justify-content:center; margin: 6px 0 12px; position:relative; z-index:1; }
+  .tabs{
+    position:relative; display:flex; gap:6px; padding:8px;
+    border-radius:999px;
+    background: transparent;
+    border:1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .tab{
+    position:relative; z-index:1;
+    padding:10px 18px; border-radius:999px;
+    font-weight:600; font-size:.98rem; color:#8c6d46;
+    cursor:pointer; user-select:none; white-space:nowrap;
+    transition:color .25s ease;
+  }
+  .tab.active{ color:#fff }
+  .tab-highlight{
+    position:absolute; top:8px; height:calc(100% - 16px);
+    border-radius:999px;
+    background: linear-gradient(135deg,#b69b7d,#8c6d46);
+    box-shadow: 0 8px 20px rgba(140,109,70,.35);
+    transition: all .45s cubic-bezier(.34,1.56,.64,1);
+    z-index:0;
+  }
+
+  /* ========= 音乐条：透明 + 边框阴影（统一风格） ========= */
+  .music-controls{
+    display:flex; justify-content:center; align-items:center; gap:16px;
+    margin: 10px auto 8px; border-radius:12px; padding:10px 14px;
+    max-width: 480px;
+    background: transparent;
+    border:1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .music-btn{
+    width:50px; height:50px; border-radius:50%;
+    background: linear-gradient(135deg,#b69b7d,#8c6d46); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:1.1rem;
+    cursor:pointer; border:none;
+    box-shadow: 0 8px 20px rgba(140,109,70,.35);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .music-btn:hover{ transform: translateY(-2px); box-shadow:0 12px 28px rgba(140,109,70,.4) }
+  .music-status{ font-size:.92rem; color:#9e8c7a }
+
+  /* ========= 舞台与卡片：用“最小不透明度填充”防止文字重影 ========= */
+  .stage{ position:relative; min-height:620px; margin: 14px auto 28px; max-width:980px; padding:0 10px; z-index:1; }
+  .card{
+    position:absolute; inset:0; width:100%;
+    padding: clamp(24px, 5vw, 48px);
+    border-radius: 16px;
+    background: var(--glass-fill);   /* 关键：防止滚动时背景文字透上来 */
+    border:1px solid var(--border);
+    box-shadow: var(--shadow);
+    opacity:0; transform: translateY(18px) scale(.996);
+    transition: opacity .5s ease, transform .5s ease;
+    pointer-events:none;
+  }
+  .card.active{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+
+  /* 卡片内部细节 */
+  .letter-header{ text-align:center; margin-bottom: 22px; padding-bottom:12px; position:relative; }
+  .letter-header:after{
+    content:""; position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+    width:120px; height:1px; background:linear-gradient(90deg,transparent,#a07d5e,transparent); opacity:.38;
+  }
+  .letter-title{ font-family:'Ma Shan Zheng',cursive; font-size:2.2rem; letter-spacing:4px; }
+  #letter-1 .letter-title{ color:#a07d5e } /* 米杏 */
+  #letter-2 .letter-title{ color:#8a6a52 } /* 浅米黄 */
+  #letter-3 .letter-title{ color:#b8846a } /* 暖粉 */
+  .letter-subtitle{ font-size:1rem; color:#8f7a66; }
+
+  .note{
+    background: var(--glass-fill);
+    border:1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-left:3px solid rgba(160,125,94,.6);
+    color:#6f5a49;
+    border-radius:12px;
+    padding:14px 16px; margin:18px 0;
+  }
+  .content{ font-size:1.06rem; color:var(--text) }
+  .content p{ margin-bottom:18px; text-indent:2em }
+  .content p.noindent{ text-indent:0 }
+
+  .sign{
+    margin-top:20px; text-align:right; font-style:italic;
+    color:#9e8c7a; font-size:1rem; position:relative; padding-right:100px;
+  }
+  .sign:before{
+    content:""; position:absolute; top:14px; right:0; width:84px; height:1px; background: rgba(160,125,94,.5);
+  }
+
+  footer{ text-align:center; padding: 20px 12px 32px; color:#9e8c7a; font-size:.92rem; position:relative; z-index:1; }
+
+  /* ========= iOS Safari 兼容：避免 fixed + blur 条纹 ========= */
+  @supports (-webkit-touch-callout: none) {
+    body { background-attachment: scroll !important; }
+  }
+
+  /* 响应式 */
+  @media (max-width:780px){
+    .site-title{ font-size:2.4rem }
+    .site-subtitle{ letter-spacing:4px }
+    .tab{ padding:8px 14px; font-size:.92rem }
+    .stage{ min-height:560px }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .tab-highlight,.card{ transition:none !important }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 顶部 -->
+  <div class="nav-glass">
+    <div class="container">
+      <div class="site-head">
+        <h1 class="site-title">青春书信集</h1>
+        <div class="site-subtitle">那些未曾寄出的思念</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-wrap">
+        <div class="tabs" role="tablist" aria-label="切换信件">
+          <button class="tab active" role="tab" aria-selected="true" aria-controls="letter-1" id="tab-1">寄不出去的信</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="letter-2" id="tab-2">迟到的回信</button>
+          <button class="tab" role="tab" aria-selected="false" aria-controls="letter-3" id="tab-3">给未来的你</button>
+          <span class="tab-highlight" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <!-- 音乐控制 -->
+      <div class="music-controls" aria-label="音乐控制">
+        <button class="music-btn" id="playToggle" aria-pressed="false" title="播放 / 暂停">
+          <i class="fas fa-play"></i>
+        </button>
+        <button class="music-btn" id="playOnce" title="播放一次">
+          <i class="fas fa-music"></i>
+        </button>
+        <div class="music-status" id="musicStatus">背景音乐 · 未播放</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 内容 -->
+  <div class="stage container">
+    <article class="card active" id="letter-1" role="tabpanel" aria-labelledby="tab-1">
+      <header class="letter-header">
+        <h2 class="letter-title">寄不出去的信</h2>
+        <div class="letter-subtitle">写给那个年少的她</div>
+      </header>
+
+      <div class="note">有些话，写下时是满心的勇气，却在送出的路上，被岁月悄悄拦下。<br>这封信，寄不出去，但它依然在我心里安静存在。</div>
+
+      <div class="content">
+        <p class="noindent">你好啊</p>
+        <p>其实不确定你是否还记得，那年年少时，我在同学的怂恿下，写了人生中第一封情书。没有华丽的词语，只有紧张与真诚。你回的“我和你一样”，成了我整个青春里最明亮的瞬间。</p>
+        <p>那是一个既美好又微妙的时刻，像梦境一样轻飘，却真实得足以让我一整天心里泛起涟漪。</p>
+        <p>后来我们没有进一步走近，只是静静地陪伴在彼此身边。初中有了手机，开始偶尔聊天；高中、大学，电话、QQ、消息偶有往来。我们像两条平行的线，曾靠得那么近，却终究没能交汇成一段爱情。</p>
+        <p>真的是很美，像一首缓缓流淌的歌，从铅笔字写成的情书开始，一直唱到了晨光里你的抖音主页。而那句“我和你一样”的回应，至今仍在我心中轻轻回响，从未褪色。</p>
+        <p>我不是不曾想更进一步。只是年少的我，不会表达，也不懂得如何去爱，所以把喜欢藏进沉默里。</p>
+        <p>今天醒来时，梦里又是你。忽然想起那些年，心里泛起一点温柔的波澜。打开抖音，看见你现在的生活，心里有些酸，也有些释然。</p>
+        <p>我终于明白，有些喜欢，只适合放在记忆里慢慢回味，而不是走进现实去兑现。</p>
+        <p>谢谢你，陪我走过了那段青涩又纯粹的岁月。你可能永远不会知道，我曾那样认真地喜欢过你。</p>
+        <p>如果有来生，我希望我可以勇敢一点。如果没有，那就把你留在心底最柔软的地方，不再打扰。</p>
+      </div>
+
+      <div class="sign">—— 致那年我偷偷喜欢过的你<br>2025/6/26 · 苹果先生</div>
+      <div class="note">如果你也有一封寄不出去的信，记得把它收好——它是你与青春彼此见证的证物。</div>
+    </article>
+
+    <article class="card" id="letter-2" role="tabpanel" aria-labelledby="tab-2">
+      <header class="letter-header">
+        <h2 class="letter-title">那封我迟到多年的回信</h2>
+        <div class="letter-subtitle">迟到多年的一句“我和你一样”</div>
+      </header>
+
+      <div class="note">有些话，不是不想说，而是那时候不敢说。直到多年以后，才终于找到合适的方式，轻轻地寄出去。</div>
+
+      <div class="content">
+        <p class="noindent">你好啊</p>
+        <p>距离那天收到你的那句话——“我和你一样”，已经过去了很多年。它像一枚温热的石子，落进我心里最深处的湖水里，涟漪一直没有散。</p>
+        <p>那时的我笨拙、迟钝，不会表达，不敢靠近。心里有千句话想说，却被我一一咽下，只留下一句“好”，然后假装若无其事。其实你不知道，在那之后的每一个放学路上，我都在想，你是不是也会像我一样，忍不住回头看。</p>
+        <p>后来，我们各自走向了不同的生活。偶尔在信息里打个招呼，更多的时候只是隔着朋友圈看彼此的近况。我也曾在深夜翻出旧聊天记录，看着那些简单的问候，觉得心里很满。</p>
+        <p>我想，如果当年我再勇敢一点，我们的故事也许会不一样。可惜时间不会倒流，我也学会了接受——有些喜欢，就是要安静地放在心里，像陈年的酒，越久越香，却不能再开启。</p>
+        <p>所以今天，我想把这封迟到了多年的回信寄给你，不为了改变什么，只为了告诉你：谢谢你曾经和我一样，谢谢你让我的青春里，有过这样干净、真诚又炙热的心动。</p>
+        <p>愿你现在过得很好，愿你身边的人，懂你当年的那句“我和你一样”。</p>
+      </div>
+
+      <div class="sign">—— 苹果先生<br>2025/8/9</div>
+      <div class="note">这封回信，也许你永远看不到，但至少我终于，把它说给了时间听。</div>
+    </article>
+
+    <article class="card" id="letter-3" role="tabpanel" aria-labelledby="tab-3">
+      <header class="letter-header">
+        <h2 class="letter-title">给未来的你</h2>
+        <div class="letter-subtitle">来自过去的问候</div>
+      </header>
+
+      <div class="note">如果信可以穿越时间，我想寄一封给未来的你，带着我此刻的真心，穿过漫长的日子，在某个不经意的瞬间抵达你手里。</div>
+
+      <div class="content">
+        <p class="noindent">你好啊</p>
+        <p>当你看到这封信时，或许我们已经很久没有联系了。也许你身边有人，也许你一个人生活得很好。无论怎样，我希望你读到这些字的时候，是笑着的。</p>
+        <p>写这封信的我，还记得你笑起来的样子。记得那年放学的黄昏，风吹得很轻，我们都没急着回家，只是在路口慢慢走。记得那句“我和你一样”，像春天的光一样，落进我心里。</p>
+        <p>我不知道这些记忆，在你那里是不是也清晰。时间会带走很多东西，可有些瞬间，好像被悄悄封存在某个抽屉里，等着某一天被你打开。</p>
+        <p>未来的你，会不会也偶尔想起我们？会不会在某个安静的夜里，想起一个很久不见的人，心里泛起一点温柔的波澜？</p>
+        <p>如果那时你已经不记得我了，那也没关系。我只希望你记得——曾经有一个人，真心地、很用力地喜欢过你。那种喜欢，不是因为你成了谁，而是因为你就是你。</p>
+        <p>愿你在未来的日子里，被温柔以待。愿你笑起来的样子，依旧像我记忆中那样干净明亮。</p>
+        <p>如果未来的你，恰好看见了我写下的这些字——就当这是一次久违的问候，来自很久很久以前，那个想对你说“你好啊”的我。</p>
+      </div>
+
+      <div class="sign">—— 苹果先生<br>2025/8/9</div>
+      <div class="note">未来的你，若是偶然读到这些字，就当是来自很久很久以前、那个仍然心怀温柔的我。</div>
+    </article>
+  </div>
+
+  <!-- 背景音乐（同目录或改成你的在线地址） -->
+  <audio id="bgm" preload="auto" loop>
+    <source src="the-flood.mp3" type="audio/mpeg">
+  </audio>
+
+<script>
+  /* ========= Tabs 切换 + 高亮定位 ========= */
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const highlight = document.querySelector('.tab-highlight');
+  const cards = ['letter-1','letter-2','letter-3'].map(id=>document.getElementById(id));
+  const nav = document.querySelector('.nav-glass');
+
+  function setNavHeightVar(){
+    if(!nav) return;
+    const h = nav.offsetHeight || 0;
+    document.documentElement.style.setProperty('--navH', h + 'px');
+  }
+
+  function setHighlightTo(idx){
+    const t = tabs[idx];
+    const rect = t.getBoundingClientRect();
+    const parentRect = t.parentElement.getBoundingClientRect();
+    highlight.style.width = rect.width + 'px';
+    highlight.style.left  = (rect.left - parentRect.left) + 'px';
+  }
+
+  function activateTab(idx){
+    tabs.forEach((t,i)=> t.classList.toggle('active', i===idx));
+    cards.forEach((c,i)=> c.classList.toggle('active', i===idx));
+    setHighlightTo(idx);
+    localStorage.setItem('activeTab', idx);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  tabs.forEach((t,i)=> t.addEventListener('click', ()=> activateTab(i)));
+
+  window.addEventListener('resize', ()=>{
+    setNavHeightVar();
+    const idx = parseInt(localStorage.getItem('activeTab')||'0',10);
+    setHighlightTo(isNaN(idx)?0:idx);
+  });
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(()=> {
+      setNavHeightVar();
+      const idx = parseInt(localStorage.getItem('activeTab')||'0',10);
+      setHighlightTo(isNaN(idx)?0:idx);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const saved = parseInt(localStorage.getItem('activeTab')||'0',10);
+    const initIdx = (!isNaN(saved) && saved>=0 && saved<tabs.length) ? saved : 0;
+    activateTab(initIdx);
+    setNavHeightVar();
+    // 淡入
+    document.body.style.opacity=0;
+    document.body.style.transition='opacity .8s ease';
+    requestAnimationFrame(()=>{ document.body.style.opacity=1; });
+  });
+
+  /* ========= 背景音乐（记忆播放状态；需一次交互后播放） ========= */
+  const bgm = document.getElementById('bgm');
+  const playToggle = document.getElementById('playToggle');
+  const playOnceBtn = document.getElementById('playOnce');
+  const musicStatus = document.getElementById('musicStatus');
+  const playIcon = playToggle.querySelector('i');
+  let interacted = false;
+
+  function updateUI(playing){
+    musicStatus.textContent = playing ? '背景音乐 · 播放中' : '背景音乐 · 未播放';
+    playToggle.setAttribute('aria-pressed', playing ? 'true':'false');
+    playIcon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+  }
+  function setPlay(playing){
+    if(playing){ bgm.play().catch(()=>{}); } else { bgm.pause(); }
+    localStorage.setItem('bgm_play', playing ? '1':'0');
+    updateUI(playing);
+  }
+  // 初始：按偏好更新 UI（不自动播放，需一次交互）
+  updateUI(localStorage.getItem('bgm_play')==='1');
+  document.addEventListener('click', ()=>{
+    if(!interacted){
+      interacted = true;
+      if(localStorage.getItem('bgm_play')==='1'){ setPlay(true); }
+    }
+  }, {once:true});
+
+  playToggle.addEventListener('click', ()=>{
+    interacted = true;
+    setPlay(bgm.paused);
+  });
+
+  playOnceBtn.addEventListener('click', ()=>{
+    interacted = true;
+    const oldLoop = bgm.loop;
+    bgm.loop = false;
+    bgm.play().then(()=> updateUI(true)).catch(()=> musicStatus.textContent='背景音乐 · 播放失败');
+    bgm.onended = ()=>{
+      bgm.loop = oldLoop || true;
+      updateUI(false);
+      localStorage.setItem('bgm_play','0');
+    };
+  });
+</script>
+</body>
+</html>
