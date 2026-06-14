@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>寄不出去的信</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&display=swap');
+
+        :root {
+            --bg-1: #fff8ef;
+            --bg-2: #f5eee5;
+            --bg-3: #eef2ef;
+            --paper-1: rgba(255, 253, 248, 0.92);
+            --paper-2: rgba(255, 249, 241, 0.82);
+            --glass: rgba(255, 255, 255, 0.54);
+            --line: rgba(184, 151, 119, 0.18);
+            --text-main: #43352f;
+            --text-soft: #7b6f67;
+            --text-faint: #a3978f;
+            --accent: #c98d61;
+            --accent-soft: rgba(255, 240, 223, 0.88);
+            --shadow: 0 22px 60px rgba(97, 70, 45, 0.10);
+            --shadow-soft: 0 14px 30px rgba(97, 70, 45, 0.08);
+            --radius-lg: 30px;
+            --radius-md: 24px;
+            --radius-sm: 999px;
+        }
+
+        * { box-sizing: border-box; }
+
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 26px 14px 40px;
+            font-family: 'Noto Serif SC', serif;
+            color: var(--text-main);
+            letter-spacing: 0.03em;
+            background:
+                radial-gradient(circle at 10% 8%, rgba(255, 214, 168, 0.64), transparent 34%),
+                radial-gradient(circle at 90% 4%, rgba(218, 229, 214, 0.74), transparent 32%),
+                radial-gradient(circle at 86% 86%, rgba(246, 198, 156, 0.42), transparent 36%),
+                linear-gradient(135deg, var(--bg-1), var(--bg-2) 48%, var(--bg-3));
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.25) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.22) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.28), transparent 76%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.28), transparent 76%);
+        }
+
+        .page {
+            width: min(860px, 100%);
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .intro {
+            padding: 24px 22px 20px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.72);
+            background: linear-gradient(135deg, rgba(255,255,255,0.74), rgba(255,247,237,0.54));
+            box-shadow: var(--shadow-soft);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro::after {
+            content: "";
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            right: -56px;
+            top: -60px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(236, 175, 118, 0.28), transparent 68%);
+        }
+
+        .eyebrow {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--accent-soft);
+            border: 1px solid rgba(217, 154, 104, 0.20);
+            color: #9a6847;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        h1 {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            font-size: clamp(28px, 5.4vw, 40px);
+            line-height: 1.18;
+            letter-spacing: -0.02em;
+            color: #5e4334;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            position: relative;
+            z-index: 1;
+            margin-top: 10px;
+            max-width: 520px;
+            color: var(--text-soft);
+            font-size: 14px;
+            line-height: 1.9;
+        }
+
+        .letter-wrap {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(255,255,255,0.70);
+            background: var(--glass);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+        }
+
+        .letter-paper {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-md);
+            padding: 34px 30px 30px;
+            background:
+                radial-gradient(circle at top left, rgba(255,255,255,0.72), transparent 34%),
+                linear-gradient(145deg, var(--paper-1), var(--paper-2));
+            border: 1px solid rgba(255,255,255,0.76);
+            box-shadow: 0 10px 20px rgba(97, 70, 45, 0.04);
+        }
+
+        .letter-paper::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent 0,
+                    transparent 40px,
+                    rgba(205, 184, 164, 0.10) 40px,
+                    rgba(205, 184, 164, 0.10) 41px
+                );
+            opacity: 0.55;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(0,0,0,0.80));
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.16), rgba(0,0,0,0.80));
+        }
+
+        .letter-paper::after {
+            content: "";
+            position: absolute;
+            width: 110px;
+            height: 110px;
+            right: -36px;
+            bottom: -40px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(217, 154, 104, 0.14), transparent 70%);
+            pointer-events: none;
+        }
+
+        .letter-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            color: var(--text-soft);
+            font-size: 12px;
+        }
+
+        .stamp {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 11px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,250,244,0.84);
+            border: 1px solid rgba(176, 145, 113, 0.14);
+        }
+
+        .stamp::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e7b47d, #c88964);
+            box-shadow: 0 0 0 5px rgba(217,154,104,0.12);
+        }
+
+        .date {
+            letter-spacing: 0.08em;
+            color: #9a8d84;
+        }
+
+        .salutation {
+            margin-bottom: 1.6rem;
+            font-size: 1.04rem;
+        }
+
+        p {
+            margin: 0 0 1.6rem;
+            text-indent: 2em;
+            font-size: 1rem;
+            line-height: 2.3;
+        }
+
+        .footer {
+            margin-top: 2.7rem;
+            font-size: 0.98rem;
+            color: #746860;
+        }
+
+        .signature {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px dashed rgba(176, 145, 113, 0.24);
+            text-align: right;
+            font-size: 0.9rem;
+            line-height: 1.9;
+            color: var(--text-faint);
+        }
+
+        .page-note {
+            margin: 18px 3px 0;
+            color: var(--text-faint);
+            font-size: 12px;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 18px 12px 36px;
+            }
+
+            .intro {
+                padding: 22px 18px 18px;
+                border-radius: 25px;
+            }
+
+            .subtitle {
+                max-width: 100%;
+                font-size: 13px;
+            }
+
+            .letter-wrap {
+                padding: 15px;
+                border-radius: 24px;
+            }
+
+            .letter-paper {
+                padding: 26px 18px 22px;
+                border-radius: 18px;
+            }
+
+            .meta {
+                margin-bottom: 18px;
+                font-size: 11px;
+            }
+
+            .salutation {
+                margin-bottom: 1.35rem;
+            }
+
+            p {
+                font-size: 0.97rem;
+                line-height: 2.12;
+                margin-bottom: 1.38rem;
+            }
+
+            .footer {
+                margin-top: 2.2rem;
+            }
+
+            .signature {
+                margin-top: 2.4rem;
+                font-size: 0.84rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="intro">
+            <div class="eyebrow">Unsent Letter</div>
+            <h1>寄不出去的信</h1>
+            <div class="subtitle">写给回不去的那段年少，也写给始终没能说出口的喜欢。</div>
+        </header>
+
+        <section class="letter-wrap">
+            <article class="letter-paper">
+                <div class="letter-inner">
+                    <div class="meta">
+                        <div class="stamp">给记忆里的人</div>
+                        <div class="date">2025 / 06 / 26</div>
+                    </div>
+
+                    <div class="salutation">你好啊：</div>
+
+                    <p>其实不确定你是否还记得，那年年少时，我在同学的怂恿下，写了人生中第一封情书。没有华丽的词语，只有紧张与真诚。你回的“我和你一样”，成了我整个青春里最明亮的瞬间。</p>
+                    <p>那是一个既美好又微妙的时刻，像梦境一样轻飘，却真实得足以让我一整天心里泛起涟漪。</p>
+                    <p>后来我们没有进一步走近，只是静静地陪伴在彼此身边。初中有了手机，开始偶尔聊天；高中、大学，电话、QQ、消息偶有往来。我们像两条平行的线，曾靠得那么近，却终究没能交汇成一段爱情。</p>
+                    <p>真的是很美，像一首缓缓流淌的歌，从铅笔字写成的情书开始，一直唱到了晨光里你的抖音主页。而那句“我和你一样”的回应，至今仍在我心中轻轻回响，从未褪色。</p>
+                    <p>我不是不曾想更进一步。只是年少的我，不会表达，也不懂得如何去爱，所以把喜欢藏进沉默里。</p>
+                    <p>今天醒来时，梦里又是你。忽然想起那些年，心里泛起一点温柔的波澜。打开抖音，看见你现在的生活，心里有些酸，也有些释然。</p>
+                    <p>我终于明白，有些喜欢，只适合放在记忆里慢慢回味，而不是走进现实去兑现。</p>
+                    <p>谢谢你，陪我走过了那段青涩又纯粹的岁月。你可能永远不会知道，我曾那样认真地喜欢过你。</p>
+                    <p>如果有来生，我希望我可以勇敢一点。如果没有，那就把你留在心底最柔软的地方，不再打扰。</p>
+
+                    <div class="footer">—— 致那年我偷偷喜欢过的你</div>
+                    <div class="signature">
+                        itspomme
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <div class="page-note">有些信，不必寄达，也算抵达。</div>
+    </div>
+</body>
+</html>
